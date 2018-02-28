@@ -41,8 +41,7 @@ public class Split {
 	}
 	
 	public static void main(String[] args) {
-		String inputDirectory = "/Users/kaushal/Desktop/Trinity/InformationRetrieval/cran/";
-		Splitter documents_splitter = new Splitter(inputDirectory + "cran.all.1400", "/Users/kaushal/Desktop/Trinity/InformationRetrieval/CranfieldSplit/document/");
+		Splitter documents_splitter = new Splitter("/Users/kaushal/Desktop/Trinity/InformationRetrieval/cran/cran.all.1400", "/Users/kaushal/Desktop/Trinity/InformationRetrieval/CranfieldSplit/document/");
 		documents_splitter.start();
 		
 		try {

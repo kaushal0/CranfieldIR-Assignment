@@ -48,12 +48,11 @@ public class SearchQueries {
 	    String index = "/Users/kaushal/Desktop/Trinity/InformationRetrieval/CranfieldSplit/index";
 	    String field = "Content";
 	    String sim = "bm25";
-	    String queries = null;
-	    int repeat = 0;
-	    boolean raw = false;
-	    String queryString = "experimental investigation of the aerodynamics of a\n" + 
-	    		"wing in a slipstream .";
-	    int hitsPerPage = 100;
+	    //String queries = null;
+	    //int repeat = 0;
+	    //boolean raw = false;
+	    //String queryString = "experimental investigation of the aerodynamics of a wing in a slipstream .";
+	    //int hitsPerPage = 100;
 	    
 	    /*for(int i = 0;i < args.length;i++) {
 	      if ("-index".equals(args[i])) {
@@ -85,7 +84,7 @@ public class SearchQueries {
 	    
 	    IndexReader reader = DirectoryReader.open(FSDirectory.open(Paths.get(index)));
 	    IndexSearcher searcher = new IndexSearcher(reader);
-	    Analyzer analyzer = new StandardAnalyzer();
+	    //Analyzer analyzer = new StandardAnalyzer();
 	    
 	    //Similarity simfn = new BM25Similarity();
 	    //searcher.setSimilarity(searcher.getDefaultSimilarity());
@@ -105,7 +104,7 @@ public class SearchQueries {
 	    
 	    /**/
 	        
-	    QueryParser parser = new QueryParser(field, analyzer);
+	    //QueryParser parser = new QueryParser(field, analyzer);
 	    
 	    
 	    //while (true) {
@@ -118,35 +117,9 @@ public class SearchQueries {
 	    		String[] pair= {};
 			boolean firstQuery=true;
 			
-			
-			/*while ((line = qBuffer.readLine()) != null) {
-
-				//System.out.println(line);
-				
-				if (line.startsWith(".W")) {
-					queryText = "";
-					continue;
-				}
-				else if (line.startsWith(".I")) {
-					if (firstQuery==true) {
-						firstQuery=false;
-						continue;
-					}
-					pair = line.split(" ", 2);
-					//System.out.println(pair[1]);
-					//System.out.println(queryText);
-					query= parser.parse(queryText);
-					System.out.println(queryText);
-					doPagingSearch(qBuffer, searcher, pair[1], query, simstring);
-				}
-				
-				queryText = queryText + line;// + System.getProperty("line.separator");
-			}*/
-			
 			while ((line = qBuffer.readLine()) != null) {
 
 				//System.out.println(line);
-				
 				if (line.startsWith(".I")) {
 					if (firstQuery==true) {
 						//pair = line.split(" ", 2);
@@ -157,8 +130,8 @@ public class SearchQueries {
 					//query= parser.parse(queryText);
 					//System.out.println(counter);
 					//System.out.println(queryText);
-					doPagingSearch(qBuffer, searcher, String.valueOf(counter), queryText, sim);
 					//pair = line.split(" ", 2);
+					doPagingSearch(qBuffer, searcher, String.valueOf(counter), queryText, sim);
 					counter++;
 					continue;
 				}
@@ -166,41 +139,10 @@ public class SearchQueries {
 					queryText="";
 					continue;
 				}				
-				queryText = queryText + line;// + System.getProperty("line.separator");
+				queryText = queryText + line;
 			}
-			query= parser.parse(queryText);
+			//query= parser.parse(queryText);
 			doPagingSearch(qBuffer, searcher, String.valueOf(counter), queryText, sim);
-			
-				
-			/*	//System.out.println(line);
-				//System.out.println(line);
-				if(A==true) {
-					if(line.startsWith(".I")) {
-						//System.out.println(line);
-						System.out.println(queryText);
-						System.out.println("\n");
-						//String[] pair = line.split(" ", 2);
-						//System.out.println(pair[1]);
-						//query= parser.parse(queryText);
-						//doPagingSearch(qBuffer, searcher, pair[1], query, simstring);
-						A=false;
-						continue;
-					}
-					queryText = queryText + line + System.getProperty("line.separator");
-				}
-				else if (line.startsWith(".W")) {
-					A=true;
-				}
-				else if (line == null || line.length() == -1) {
-					break;
-				}
-				
-			}
-			//String[] pair = line.split(" ", 2);
-			//Query query = parser.parse(pair[1]);
-
-			//doPagingSearch(in, searcher, pair[0], query, simstring);
-		//}*/
 	    
 	    qBuffer.close();
 	  }
@@ -217,20 +159,19 @@ public class SearchQueries {
 		Query query2 = parser2.parse(queryText);
 		Query query3 = parser3.parse(queryText);
 		
-	    Query boostedTermQuery1 = new BoostQuery(query1, (float) 2);
-	    Query boostedTermQuery2 = new BoostQuery(query2, (float) 2.5);
-	    Query boostedTermQuery3 = new BoostQuery(query3, (float) 0.5);
+	    Query bQuery1 = new BoostQuery(query1, (float) 2);
+	    Query bQuery2 = new BoostQuery(query2, (float) 2.5);
+	    Query bQuery3 = new BoostQuery(query3, (float) 0.5);
 	
 	    BooleanQuery.Builder booleanQuery = new BooleanQuery.Builder();
-	    booleanQuery.add(boostedTermQuery1, Occur.SHOULD);
-	    booleanQuery.add(boostedTermQuery2, Occur.SHOULD);
-	    booleanQuery.add(boostedTermQuery3, Occur.SHOULD);
+	    booleanQuery.add(bQuery1, Occur.SHOULD);
+	    booleanQuery.add(bQuery2, Occur.SHOULD);
+	    booleanQuery.add(bQuery3, Occur.SHOULD);
 		
 		//PrintStream out = new PrintStream(new FileOutputStream("/Users/kaushal/Desktop/Trinity/InformationRetrieval/cran/outputEval1.log", true));
 		// Collect enough docs to show 5 pages 
 		TopDocs results = searcher.search(booleanQuery.build(), 15);
 		ScoreDoc[] hits = results.scoreDocs;
-		//HashMap<String, String> DocOutput = new HashMap<String, String>(1000);
 		int numTotalHits = Math.toIntExact(results.totalHits);
 		
 		int count;
@@ -249,13 +190,6 @@ public class SearchQueries {
 			}
 			docno= docno.substring(76, count);
 			
-			qid= qid.replaceFirst("^0+(?!$)", "");
-			//System.out.println(qid);
-			// There are duplicate document numbers in the FR collection, so only output a given docno once.
-			/*if (DocOutput.containsKey(docno)) {
-				continue;
-			}*/
-			//DocOutput.put(docno, docno);
 			System.out.println(qid+" Q0 "+docno+" "+i+" "+hits[i].score+" "+sim);
 			//System.out.println(qid+" Q0 "+docno+" "+i+" "+hits[i].score+" "+sim);			
 			//System.out.println(qid+" "+0+" "+docno+" "+Math.round((hits[i].score)));
