@@ -1,4 +1,4 @@
-package org.apache.lucene.demo;
+//package org.apache.lucene.demo;
 
 import java.io.BufferedReader;
 import java.io.File;
